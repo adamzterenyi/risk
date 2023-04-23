@@ -111,8 +111,20 @@ class Board(object):
         Returns:
             bool: True if the input path is valid
         '''
+        if not len(set(path)) == len(path):
+            return False
 
-    
+        def go(xs):
+            if len(path) <= 1:
+                return True
+            neighbors = list(self.neighbors(path[0]))
+            neighbors = [neighbor.territory_id for neighbor in neighbors]
+            if path[1] in neighbors:
+                return self.is_valid_path(xs[1:])
+            else:
+                return False
+        return go(path)
+
     def is_valid_attack_path(self, path):
         '''
         The rules of Risk state that when attacking, 
@@ -130,7 +142,22 @@ class Board(object):
         Returns:
             bool: True if the path is an attack path
         '''
+        if not len(set(path)) == len(path):
+            return False
 
+        def go(xs):
+            if len(path) <= 1:
+                return False
+            neighbors = list(self.neighbors(path[0]))
+            neighbors = [neighbor.territory_id for neighbor in neighbors]
+            if self.owner(path[0]) not in neighbors:
+                return True
+            else:
+                return False
+        if self.is_valid_path(path) == True:
+            return go(path)
+        else:
+            return False
 
     def cost_of_attack_path(self, path):
         '''
@@ -628,3 +655,5 @@ class Board(object):
             generator: Generator of Territories.
         """
         return (t for t in self.data if (t.player_id == player_id and t.armies > 1))
+
+#plt.savefig('board.py.png')
